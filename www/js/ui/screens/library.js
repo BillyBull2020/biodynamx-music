@@ -8,11 +8,15 @@ import { itemProgress } from '../../util/storage.js';
 import { allItems, getTrack } from '../../content/library.js';
 import { backButton, pill, starsEl, topbar } from '../components.js';
 
+// Filters match either the item kind (song/riff/drill) or a tag (rock, love,
+// campfire, drums), because "rock" is a style, not a shape of exercise.
 const FILTERS = [
   { id: 'all', label: 'All' },
-  { id: 'song', label: 'Songs' },
+  { id: 'rock', label: 'Rock' },
+  { id: 'campfire', label: 'Campfire' },
+  { id: 'love', label: 'Love' },
+  { id: 'drums', label: 'Drums' },
   { id: 'riff', label: 'Riffs' },
-  { id: 'chord', label: 'Chords' },
   { id: 'drill', label: 'Drills' },
 ];
 
@@ -23,7 +27,14 @@ const KIND_LABEL = {
   drill: 'Exercise',
   scale: 'Scale',
   pattern: 'Pattern',
+  drums: 'Drum chart',
 };
+
+function matchesFilter(item, filter) {
+  if (filter === 'all') return true;
+  if (item.kind === filter) return true;
+  return Array.isArray(item.tags) && item.tags.includes(filter);
+}
 
 export function songsScreen({ navigate, present }) {
   let filter = 'all';
@@ -31,7 +42,7 @@ export function songsScreen({ navigate, present }) {
 
   function paint() {
     const items = allItems()
-      .filter((i) => filter === 'all' || i.kind === filter)
+      .filter((i) => matchesFilter(i, filter))
       .sort((a, b) => a.level - b.level || a.title.localeCompare(b.title));
     listHost.innerHTML = '';
     for (const spec of items) {
@@ -74,7 +85,10 @@ export function songsScreen({ navigate, present }) {
 
   const node = el('div.fade-in', {}, [
     el('h1', { text: 'Songs & riffs' }),
-    el('p.sub', { text: 'Twelve public-domain and original pieces, plus the drills that build them.', style: { marginBottom: '14px' } }),
+    el('p.sub', {
+      text: 'Rock, love songs, campfire singalongs and drum charts — all public domain or written for this app.',
+      style: { marginBottom: '14px' },
+    }),
     el('div.hstack', { style: { overflowX: 'auto', paddingBottom: '12px', gap: '6px' } }, chips),
     listHost,
   ]);
@@ -116,7 +130,10 @@ export function itemScreen({ params, navigate, present }) {
       el(
         'button.btn.btn--primary.btn--lg.btn--block',
         { type: 'button', onclick: () => navigate(`/play/${t.id}?mode=practice`) },
-        [icon('play', 18), 'Practice — the song waits for you'],
+        [
+          icon('play', 18),
+          t.mode === 'drums' ? 'Practice — the pattern waits for you' : 'Practice — the song waits for you',
+        ],
       ),
       el(
         'button.btn.btn--block',
@@ -124,7 +141,13 @@ export function itemScreen({ params, navigate, present }) {
         [icon('songs', 18), 'Play at full tempo for stars'],
       ),
     ]),
-    el('p.tiny', { style: { marginTop: '12px' }, text: 'Hold your phone or laptop near the guitar. Headphones make recognition more reliable.' }),
+    el('p.tiny', {
+      style: { marginTop: '12px' },
+      text:
+        t.mode === 'drums'
+          ? 'Drum charts are graded on timing. Tap the pads at the bottom of the screen, or play a real kit near the microphone.'
+          : 'Hold your phone or laptop near the guitar. Headphones make recognition more reliable.',
+    }),
   ]);
 
   present({

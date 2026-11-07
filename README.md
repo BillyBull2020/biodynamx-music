@@ -113,13 +113,28 @@ synthetic test bench: **±0.03 cents** across the neck at 44.1 and 48 kHz.
 numbers on the notes, chord blocks with strum direction, bar numbers down the
 side, and a live read-out of what the app is hearing.
 
-**Ten levels, 35 pieces.** Open strings → first melodies → cowboy chords →
+**Drums too.** Yousician doesn't teach drums, so this is an addition rather than a
+port: drum charts are graded on *attack timing* (spectral flux plus an energy-rise
+gate) instead of pitch, and you can play them on a real kit near the microphone
+**or** on four on-screen pads that always work.
+
+**Ten levels, 53 pieces.** Open strings → first melodies → cowboy chords →
 the four-chord loop → riffs → lead → barre → fingerstyle → groove → full pieces.
 Nothing is locked; skip ahead whenever you like.
 
-**12 songs and 23 drills.** All public domain (Twinkle, Ode to Joy, Greensleeves,
-Scarborough Fair, Amazing Grace, House of the Rising Sun, Für Elise, Minuet in G)
-or written for this app. No licensed material, nothing to take down.
+**22 songs and 31 drills**, filterable by **Rock**, **Campfire**, **Love** and
+**Drums**:
+
+- *Rock* — Redline (punk), Highway Fire, Deep Water (blues-rock), Static Bloom
+- *Campfire* — Kumbaya, She'll Be Coming Round the Mountain, Oh! Susanna,
+  Home on the Range, I've Been Working on the Railroad
+- *Love* — Slow Burn, Only You, Lamplight, The Water Is Wide
+- *Drums* — First beat, Four on the floor, Fast and loud, Half-time feel, Beat into a fill
+
+Everything is public domain (Twinkle, Ode to Joy, Greensleeves, Scarborough Fair,
+Amazing Grace, House of the Rising Sun, Für Elise, Minuet in G, and the
+traditional songs above) or written for this app. No licensed material, nothing
+to take down.
 
 **A band that costs nothing.** Kick, snare, hats, bass and click are synthesised
 at runtime from oscillators and a noise buffer. No audio files, so the whole app
@@ -160,6 +175,7 @@ engine, the note highway geometry and the judgment windows are original work.
 
 ```powershell
 node tools/pitch-test.mjs      # pitch engine against synthesised strings
+node tools/onset-test.mjs      # drum attack detection against synthesised kit hits
 node tools/content-test.mjs    # every piece builds, is in range, is playable
 node tools/serve.mjs           # then run the browser tests below
 ```
@@ -167,11 +183,18 @@ node tools/serve.mjs           # then run the browser tests below
 The pitch bench checks all six open strings, 40 fretted notes, a ±40 cent detune
 sweep, silence/noise rejection and chord chroma, at 44.1 and 48 kHz.
 
+The onset bench streams a synthesised beat through the detector the way the live
+engine does and requires every hit to be found, none duplicated, and nothing to
+fire on silence, steady noise, or a **sustained guitar chord** — that last one is
+what forced the energy-rise gate, because spectral flux alone rattles along with a
+decaying note.
+
 The gameplay path was verified end-to-end in a real browser using Chrome's fake
 audio device fed with a synthesised low-E loop
 (`tools/make_test_audio.py` → `tools/fixtures/lowE-loop.wav`): the microphone
 opened, the count-in ran, all 8 notes were judged Perfect, and the run scored
-100,000 with three stars.
+100,000 with three stars. The drum path was verified the same way through the
+on-screen pads: 24/24 hits judged Perfect, 100,000, three stars.
 
 ---
 
@@ -181,12 +204,14 @@ opened, the count-in ran, all 8 notes were judged Perfect, and the run scored
 www/                 the entire app — this folder is the deliverable
   index.html
   js/audio/pitch.js      YIN + inharmonicity-aware spectral refinement
+  js/audio/onset.js      drum attack detection (spectral flux + energy gate)
   js/audio/engine.js     microphone capture (ScriptProcessor, iOS-safe)
   js/audio/band.js       synthesised drums, bass, metronome, reference tones
-  js/game/session.js     playhead, wait-mode clamping, judging
-  js/ui/highway.js       canvas note highway
+  js/game/session.js     playhead, wait-mode clamping, judging (pitch and drums)
+  js/ui/highway.js       canvas note highway (string lanes or drum lanes)
   js/music/scoring.js    windows, multiplier, stars, score
-  js/content/library.js  35 pieces + the 10-level path
+  js/music/drums.js      drum lane grid notation
+  js/content/library.js  53 pieces + the 10-level path
 tools/               dev server, test benches, icon/audio generators
 native/              Capacitor shell + instructions for APK/IPA
 docs/                reverse-engineering report, product brief, evidence

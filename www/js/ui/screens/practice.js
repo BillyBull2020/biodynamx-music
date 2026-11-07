@@ -67,7 +67,34 @@ export function practiceScreen({ params, query, navigate, present, shell }) {
     el('button.btn.btn--sm', { type: 'button', onclick: () => previewCurrent(), text: 'Hear it' }),
   ]);
 
-  const game = el('div.game', {}, [hud, stage, foot]);
+  // Drum kits are graded on attack timing, and a phone microphone in a room with
+  // a real kit is unforgiving — so drum charts also get four on-screen pads. The
+  // pads always work; the microphone is the option for a real kit.
+  const DRUM_PADS = [
+    { lane: 0, label: 'Kick', key: 'kick' },
+    { lane: 1, label: 'Snare', key: 'snare' },
+    { lane: 2, label: 'Hat', key: 'hat' },
+    { lane: 3, label: 'Tom', key: 'tom' },
+  ];
+  const padButtons = DRUM_PADS.map((p) =>
+    el(
+      'button.pad',
+      {
+        type: 'button',
+        'data-lane': String(p.lane),
+        onpointerdown: (ev) => {
+          ev.preventDefault();
+          ev.currentTarget.classList.add('pad--down');
+          setTimeout(() => ev.currentTarget.classList.remove('pad--down'), 110);
+          session?.padHit(p.lane);
+        },
+      },
+      [el('b', { text: p.label })],
+    ),
+  );
+  const pads = track.mode === 'drums' ? el('div.pads', {}, padButtons) : null;
+
+  const game = el('div.game', {}, [hud, stage, pads, foot]);
 
   /* ------------------------------------------------------------- mic gate */
 
@@ -90,7 +117,11 @@ export function practiceScreen({ params, query, navigate, present, shell }) {
       el('div', { style: { display: 'grid', placeItems: 'center', marginBottom: '10px' } }, [icon('mic', 34)]),
       el('h2', { text: mode === 'play' ? 'Ready to play?' : 'Ready to practise?' }),
       el('p.sub', {
-        text: message || 'Bio Dynamx listens through your microphone to hear which notes you play. Nothing is recorded or uploaded.',
+        text:
+          message ||
+          (track.mode === 'drums'
+            ? 'Play on a real kit, or tap the pads at the bottom of the screen — the pads always work. Nothing is recorded or uploaded.'
+            : 'Bio Dynamx listens through your microphone to hear which notes you play. Nothing is recorded or uploaded.'),
         style: { maxWidth: '34ch', margin: '0 auto 14px' },
       }),
       el(
@@ -153,6 +184,14 @@ export function practiceScreen({ params, query, navigate, present, shell }) {
             if (st.combo > 1) showCombo(st.combo);
           },
           onCountIn: (n) => showCountIn(n),
+          onPad: (lane) => {
+            // Flash the pad the engine heard, so a real kit gets visual feedback.
+            if (lane == null) return;
+            const btn = padButtons[lane];
+            if (!btn) return;
+            btn.classList.add('pad--heard');
+            setTimeout(() => btn.classList.remove('pad--heard'), 130);
+          },
           onFinish: (summary) => finish(summary),
         },
       });

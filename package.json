@@ -9,8 +9,9 @@
     "start": "node tools/serve.mjs",
     "serve": "node tools/serve.mjs --host 0.0.0.0",
     "test:pitch": "node tools/pitch-test.mjs",
+    "test:onset": "node tools/onset-test.mjs",
     "test:content": "node tools/content-test.mjs",
-    "test": "node tools/pitch-test.mjs && node tools/content-test.mjs",
+    "test": "node tools/pitch-test.mjs && node tools/onset-test.mjs && node tools/content-test.mjs",
     "icons": "python tools/make_icons.py"
   },
   "engines": {

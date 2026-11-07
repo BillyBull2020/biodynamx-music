@@ -6,7 +6,7 @@
  * is picked up on the next launch (bump VERSION when shipping).
  */
 
-const VERSION = 'bdm-v1';
+const VERSION = 'bdm-v2';
 const SHELL = [
   './',
   'index.html',
@@ -17,10 +17,12 @@ const SHELL = [
   'js/util/storage.js',
   'js/music/theory.js',
   'js/music/tab.js',
+  'js/music/drums.js',
   'js/music/track.js',
   'js/music/scoring.js',
   'js/content/library.js',
   'js/audio/pitch.js',
+  'js/audio/onset.js',
   'js/audio/engine.js',
   'js/audio/band.js',
   'js/game/session.js',

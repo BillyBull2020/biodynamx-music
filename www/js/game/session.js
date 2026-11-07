@@ -12,6 +12,7 @@
  */
 
 import { analyseNote, analyseSpectrum, midiToHz } from '../audio/pitch.js';
+import { OnsetDetector } from '../audio/onset.js';
 import {
   RunScorer,
   TOLERANCES,
@@ -80,6 +81,16 @@ export class Session {
     // way keeps wrong notes visible instead of silently rejected).
     this.input.setRange(Math.max(45, midiToHz(lo - 12)), Math.min(2200, midiToHz(hi + 12)));
     this.range = { lo: lo - 12, hi: hi + 12 };
+
+    // Drums are graded on attack timing, not pitch.
+    this.isDrums = this.track.mode === 'drums';
+    if (this.isDrums) {
+      this.onset = new OnsetDetector();
+      // Onset timing wants the finest frame the engine can give.
+      this._prevDecimate = this.input.decimate;
+      this.input.decimate = 1;
+    }
+    this.lastOnset = null;
   }
 
   get countInSeconds() {
@@ -192,6 +203,9 @@ export class Session {
     this.band.stop();
     if (this._unlisten) this._unlisten();
     this._unlisten = null;
+    // Put the analysis rate back so the next guitar run is not paying for the
+    // finer drum frames.
+    if (this.isDrums && this._prevDecimate != null) this.input.decimate = this._prevDecimate;
   }
 
   nextPendingIndex() {
@@ -286,10 +300,18 @@ export class Session {
       this.lastLevel = this.input.level;
       return;
     }
+    this.lastLevel = this.input.level;
+
+    if (this.isDrums) {
+      const hit = this.onset.push(buf, sampleRate, ctxTime);
+      this.lastOnset = hit;
+      if (hit.onset) this._onHit(ctxTime, false);
+      return;
+    }
+
     const opts = { minHz: Math.max(50, midiToHz(this.range.lo)), maxHz: Math.min(2400, midiToHz(this.range.hi)) };
     const note = analyseNote(buf, sampleRate, opts);
     this.lastPitch = note;
-    this.lastLevel = this.input.level;
 
     if (this.track.mode === 'chords') {
       this.lastChroma = analyseSpectrum(buf, sampleRate, { fftSize: 4096 }).chroma;
@@ -297,6 +319,59 @@ export class Session {
 
     if (this.waitToPlay) this._tryWaitMode(note);
     else this._tryFlowMode(note, ctxTime);
+  }
+
+  /**
+   * A drum hit happened: from the microphone, or from tapping a pad.
+   * One physical hit can satisfy several simultaneous events (kick + hat), so
+   * every pending event at that moment is judged.
+   */
+  _onHit(ctxTime, fromPad) {
+    if (this.waitToPlay) {
+      const i = this.nextPendingIndex();
+      if (i < 0) return;
+      this._judge(i, 'perfect', { timingMs: 0, held: true });
+      this._lastHoldKey = -1;
+      if (fromPad) this.hooks.onPad?.(this.track.events[i].drum);
+      return;
+    }
+
+    const judgedBeat = this.currentBeat() - this.latencyMs / 1000 / this.spb;
+    const windowBeats = this.tolerance.good / 1000 / this.spb;
+    let firstBeat = null;
+    let judged = 0;
+
+    for (let i = 0; i < this.states.length; i++) {
+      if (this.states[i] !== 'pending') continue;
+      const e = this.track.events[i];
+      const delta = judgedBeat - e.beat;
+      if (delta < -windowBeats) break;
+      if (Math.abs(delta) > windowBeats) continue;
+      // Simultaneous events (within a 16th) belong to the same physical hit.
+      if (firstBeat !== null && Math.abs(e.beat - firstBeat) > 0.25) continue;
+      const timingMs = delta * this.spb * 1000;
+      const j = timingJudgement(Math.abs(timingMs), this.tolerance);
+      if (j === 'miss') continue;
+      if (firstBeat === null) firstBeat = e.beat;
+      this._judge(i, j, { timingMs, pad: fromPad });
+      judged++;
+    }
+    if (judged && fromPad) this.hooks.onPad?.(null);
+  }
+
+  /** Screen pad pressed. Times the hit against the running playhead. */
+  padHit(lane) {
+    if (this.finished || this.paused) return;
+    if (this.waitToPlay) {
+      const i = this.nextPendingIndex();
+      if (i >= 0 && this.track.events[i].string === lane) {
+        this._judge(i, 'perfect', { timingMs: 0, held: true, pad: true });
+        this._lastHoldKey = -1;
+        this.hooks.onPad?.(lane);
+      }
+      return;
+    }
+    this._onHit(this.input.ctx.currentTime, true);
   }
 
   /** Practice + wait: the next note must be played before time moves on. */
@@ -395,6 +470,12 @@ export class Session {
     const i = this.nextPendingIndex();
     if (i < 0) return;
     const e = this.track.events[i];
+    if (this.isDrums) {
+      // A pitched tone would be nonsense for a drum; use a short kit-ish blip.
+      const tones = { kick: 90, snare: 420, hat: 1800, tom: 220 };
+      this.band.blip(tones[e.drum] || 400, e.drum === 'hat' ? 0.05 : 0.12, 'triangle', 0.22);
+      return;
+    }
     if (this.track.mode === 'chords') {
       for (const m of e.midis) this.band.referenceTone(m, 1.4);
     } else {

@@ -8,6 +8,7 @@
  */
 
 import { findPosition, fretMidi, noteName, noteWithOctave, parseNote, shapeMidis, tuning } from './theory.js';
+import { DRUM_GLYPH, DRUM_LABEL, DRUM_LANES, DRUM_MIDI } from './drums.js';
 
 /**
  * @typedef {Object} TrackEvent
@@ -72,13 +73,35 @@ export function makeTrack(spec) {
     about = '',
     notes = [],
     chords = [],
+    drums = [],
     mode,
     countInBeats = 4,
     pitchTrack = null,
   } = spec;
 
   const events = [];
-  const strings = tuning(tuningId).midis.length;
+  const strings = drums.length && !notes.length && !chords.length ? 4 : tuning(tuningId).midis.length;
+
+  // Drum events reuse the note shape: the "string" is the lane, the label is the
+  // glyph, and midi is the General MIDI percussion number so the backing band and
+  // any code that reads midi still behave.
+  for (const d of drums) {
+    const lane = d.lane ?? 0;
+    const midi = DRUM_MIDI[d.drum] ?? 36;
+    events.push({
+      beat: d.beat,
+      durBeats: d.durBeats ?? 0.5,
+      midi,
+      midis: [midi],
+      string: lane,
+      fret: 0,
+      drum: d.drum,
+      accent: d.accent !== false,
+      label: DRUM_GLYPH[d.drum] || '•',
+      shortLabel: DRUM_GLYPH[d.drum] || '•',
+      isChord: false,
+    });
+  }
 
   for (const n of notes) {
     const durBeats = n.durBeats ?? 1;
@@ -147,10 +170,13 @@ export function makeTrack(spec) {
   // Merge simultaneous single notes into one event. Riffs use double stops
   // (open E plus a fretted octave, for example), and the judge has to grade them
   // as one hit — otherwise the highway shows two notes the player cannot separate.
+  //
+  // Drum hits are never merged: a kick and a hat at the same moment are two
+  // different limbs and two separate things to play.
   const merged = [];
   for (const e of events) {
     const prev = merged[merged.length - 1];
-    if (prev && !prev.isChord && !e.isChord && Math.abs(prev.beat - e.beat) < 1e-6) {
+    if (prev && !prev.drum && !e.drum && !prev.isChord && !e.isChord && Math.abs(prev.beat - e.beat) < 1e-6) {
       prev.midis = [...new Set([...prev.midis, ...e.midis])].sort((a, b) => a - b);
       prev.midi = prev.midis[0];
       prev.isChord = prev.midis.length > 1;
@@ -165,6 +191,7 @@ export function makeTrack(spec) {
   });
 
   const lastBeat = merged.reduce((m, e) => Math.max(m, e.beat + e.durBeats), 0);
+  const isDrum = drums.length > 0 && notes.length === 0 && chords.length === 0;
   const track = {
     id,
     title,
@@ -174,7 +201,7 @@ export function makeTrack(spec) {
     bpm,
     beatsPerBar,
     tuningId,
-    mode: mode || (chords.length ? 'chords' : 'melody'),
+    mode: mode || (isDrum ? 'drums' : chords.length ? 'chords' : 'melody'),
     events: merged,
     totalBeats: Math.max(lastBeat, beatsPerBar),
     tags,
@@ -182,6 +209,9 @@ export function makeTrack(spec) {
     about,
     countInBeats,
     stringCount: strings,
+    // Lane captions for the highway. Drums get kit names, guitar gets strings.
+    laneLabels: isDrum ? DRUM_LANES.map((l) => DRUM_GLYPH[l]) : null,
+    laneNames: isDrum ? DRUM_LANES.map((l) => DRUM_LABEL[l]) : null,
     pitchTrack,
   };
 

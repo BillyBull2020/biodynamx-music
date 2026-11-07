@@ -258,7 +258,8 @@ export class Highway {
       ctx.font = `800 ${Math.max(9, Math.round(r * 0.95))}px ui-sans-serif, system-ui, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(String(e.fret ?? 0), x, y + 0.5);
+      // Drum notes carry a K/S/H/T glyph; guitar notes carry the fret number.
+      ctx.fillText(e.drum ? e.label : String(e.fret ?? 0), x, y + 0.5);
     }
     ctx.globalAlpha = 1;
   }
@@ -346,19 +347,20 @@ export class Highway {
 
   _drawLabels(ctx) {
     const strings = this.track.stringCount || 6;
+    const labels = this.track.laneLabels;
     ctx.font = `700 ${Math.max(10, Math.round(this.w * 0.028))}px ui-sans-serif, system-ui, sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const y = this.h - Math.max(34, this.h * 0.07);
     for (let s = 0; s < strings; s++) {
       const x = this.laneX(s, this.hitY);
-      ctx.fillStyle = 'rgba(143,167,196,0.55)';
       ctx.beginPath();
       ctx.arc(x, y, Math.max(11, this.w * 0.032), 0, Math.PI * 2);
       ctx.fillStyle = 'rgba(16, 42, 77, 0.85)';
       ctx.fill();
       ctx.fillStyle = COLORS.text;
-      ctx.fillText(noteName(this._stringOpenMidi(s)), x, y + 0.5);
+      // Drum lanes are captioned K/S/H/T; guitar lanes are the open-string note.
+      ctx.fillText(labels ? labels[s] : noteName(this._stringOpenMidi(s)), x, y + 0.5);
     }
   }
 

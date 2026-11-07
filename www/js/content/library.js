@@ -19,12 +19,18 @@
 import { makeTrack } from '../music/track.js';
 import { parseTab, sequence } from '../music/tab.js';
 import { CHORDS, shapeMidis } from '../music/theory.js';
+import { drumPattern } from '../music/drums.js';
 
 /* --------------------------------------------------------------- helpers */
 
 /** Melody from [ ['C4', 1], ... ] beat pairs. */
 function melody(pairs, opts = {}) {
   return () => ({ notes: sequence(pairs, opts).events, tuningId: opts.tuningId || 'standard' });
+}
+
+/** Drum chart from lane grids: one grid character per step. */
+function drums(rows, opts = {}) {
+  return () => ({ drums: drumPattern(rows, opts) });
 }
 
 /** Tablature drill with an explicit grid. */
@@ -749,6 +755,292 @@ const SPECS = {
   },
 };
 
+/* ================================================================ DRUMS ===
+ * Yousician has no drum instrument (its five are guitar, piano, ukulele, bass
+ * and singing), so this whole section is new. Charts are step grids; see
+ * js/music/drums.js. Grading is by attack timing, not pitch.
+ */
+
+const DRUM_SPECS = {
+  'drums-basic': {
+    title: 'First beat',
+    subtitle: 'Kick, snare and hi-hat',
+    kind: 'drums',
+    level: 1,
+    bpm: 90,
+    difficulty: 1,
+    tags: ['drums', 'rock'],
+    about:
+      'The beat behind most rock and pop: kick on 1 and 3, snare on 2 and 4, hat on every eighth. Tap the pads, or play it on a real kit.',
+    make: drums({ kick: 'X---X---', snare: '--X---X-', hat: 'XXXXXXXX' }, { repeats: 2 }),
+  },
+  'drums-four-floor': {
+    title: 'Four on the floor',
+    subtitle: 'A dance beat',
+    kind: 'drums',
+    level: 6,
+    bpm: 112,
+    difficulty: 2,
+    tags: ['drums', 'pop'],
+    about: 'Kick on every beat, snare on 2 and 4. Steady is the whole trick — the hats hold it together.',
+    make: drums({ kick: 'X-X-X-X-', snare: '--X---X-', hat: 'X-X-X-X-' }, { repeats: 2 }),
+  },
+  'drums-punk': {
+    title: 'Fast and loud',
+    subtitle: 'Punk beat at speed',
+    kind: 'drums',
+    level: 6,
+    bpm: 150,
+    difficulty: 3,
+    tags: ['drums', 'rock'],
+    about: 'Same rock beat, twice the tempo. If it falls apart, drop the tempo to 100 and build back up.',
+    make: drums({ kick: 'X---X---', snare: '--X---X-', hat: 'XXXXXXXX' }, { repeats: 2 }),
+  },
+  'drums-half-time': {
+    title: 'Half-time feel',
+    subtitle: 'Big and slow',
+    kind: 'drums',
+    level: 9,
+    bpm: 76,
+    difficulty: 2,
+    tags: ['drums', 'rock', 'ballad'],
+    about:
+      'The snare moves to beat 3, which makes the groove feel half as fast. This is the beat under most rock ballads.',
+    make: drums({ kick: 'X-------', snare: '----X---', hat: 'X-X-X-X-' }, { repeats: 2 }),
+  },
+  'drums-fill': {
+    title: 'Beat into a fill',
+    subtitle: 'Two bars, ending in toms',
+    kind: 'drums',
+    level: 9,
+    bpm: 100,
+    difficulty: 3,
+    tags: ['drums', 'rock'],
+    about:
+      'One bar of the basic beat, then the same bar with the last two beats moved to the toms. Fills are how you get from one section to the next.',
+    make: drums(
+      {
+        kick: 'X---X---X---X---',
+        snare: '--X---X---------',
+        hat: 'XXXXXXXXXXXX----',
+        tom: '------------X-X-',
+      },
+      { stepsPerBeat: 2 },
+    ),
+  },
+};
+
+/* -------------------------------------------------------------- new songs */
+
+const SONG_SPECS = {
+  /* ---------------------------------------------------------------- rock */
+  'riff-redline': {
+    title: 'Redline',
+    subtitle: 'Original punk riff',
+    kind: 'riff',
+    level: 5,
+    bpm: 152,
+    difficulty: 3,
+    tags: ['rock', 'riff', 'power'],
+    about:
+      'Three power chords, all on the low E string. Keep the fretting hand relaxed — speed comes from the picking wrist, not from squeezing.',
+    make: tab(`
+      e|----------------|
+      B|----------------|
+      G|----------------|
+      D|----------------|
+      A|----------------|
+      E|0-0-0-0-3-3-5-5-|
+    `),
+  },
+  'riff-highway-fire': {
+    title: 'Highway Fire',
+    subtitle: 'Original classic rock riff',
+    kind: 'riff',
+    level: 5,
+    bpm: 120,
+    difficulty: 3,
+    tags: ['rock', 'riff', 'power'],
+    about: 'A driving A5 to G5 to E5 riff. Let the open low E ring between the chord stabs.',
+    make: tab(`
+      e|----------------|
+      B|----------------|
+      G|----------------|
+      D|----------------|
+      A|----------------|
+      E|5-5-5-5-3-3-3-3-|
+    `),
+  },
+  'riff-deep-water': {
+    title: 'Deep Water',
+    subtitle: 'Original blues-rock riff',
+    kind: 'riff',
+    level: 10,
+    bpm: 104,
+    difficulty: 4,
+    tags: ['rock', 'blues', 'riff'],
+    about:
+      'A minor-third stab over an open E drone. The silence between the notes matters as much as the notes — do not rush it.',
+    make: tab(`
+      e|----------------|
+      B|----------------|
+      G|----------------|
+      D|----------------|
+      A|----------------|
+      E|0-0-3-0-3-0-5-3-|
+    `),
+  },
+  'song-static-bloom': {
+    title: 'Static Bloom',
+    subtitle: 'Original rock ballad',
+    kind: 'song',
+    level: 10,
+    bpm: 76,
+    difficulty: 3,
+    tags: ['rock', 'chords', 'ballad'],
+    about:
+      'Am, F, C, G with a wide, ringing strum. Ballads reward letting chords ring rather than chopping at them.',
+    make: chordSeq(
+      [['Am', 4], ['F', 4], ['C', 4], ['G', 4], ['Am', 4], ['F', 4], ['G', 4], ['G', 4]],
+      { pattern: 'D---D-DU' },
+    ),
+  },
+
+  /* ---------------------------------------------------------------- love */
+  'song-slow-burn': {
+    title: 'Slow Burn',
+    subtitle: 'Original ballad',
+    kind: 'song',
+    level: 7,
+    bpm: 68,
+    difficulty: 3,
+    tags: ['love', 'chords', 'ballad'],
+    about:
+      'Am, F, C, G played slowly with one soft strum per bar and a lift at the end. Leave space and let the guitar breathe.',
+    make: chordSeq(
+      [['Am', 4], ['F', 4], ['C', 4], ['G', 4], ['Am', 4], ['F', 4], ['G', 4], ['Am', 4]],
+      { pattern: 'D---D-U-' },
+    ),
+  },
+  'song-only-you': {
+    title: 'Only You',
+    subtitle: 'Original love song',
+    kind: 'song',
+    level: 7,
+    bpm: 84,
+    difficulty: 2,
+    tags: ['love', 'chords', 'campfire'],
+    about: 'G, Em, C, D — the warmest four chords there are. Simple on purpose: sing over it.',
+    make: chordSeq(
+      [['G', 4], ['Em', 4], ['C', 4], ['D', 4], ['G', 4], ['Em', 4], ['C', 4], ['D', 4]],
+      { pattern: 'D-DU' },
+    ),
+  },
+  'song-lamplight': {
+    title: 'Lamplight',
+    subtitle: 'Original fingerstyle ballad',
+    kind: 'song',
+    level: 8,
+    bpm: 72,
+    difficulty: 4,
+    tags: ['love', 'fingerstyle', 'ballad'],
+    about:
+      'Fingerpicked Em, C, G, D. Thumb on the beat, fingers filling in between — the quiet version of a love song.',
+    make: chordSeq(
+      [['Em', 4], ['C', 4], ['G', 4], ['D', 4], ['Em', 4], ['C', 4], ['D', 4], ['Em', 4]],
+      { pattern: 'D-U-D-U-' },
+    ),
+  },
+  'song-water-is-wide': {
+    title: 'The Water Is Wide',
+    subtitle: 'Traditional (public domain)',
+    kind: 'song',
+    level: 8,
+    bpm: 76,
+    difficulty: 3,
+    tags: ['love', 'chords', 'traditional'],
+    about: 'An old Scottish love song still sung everywhere. D, A, Bm, G with a gentle rolling strum.',
+    make: chordSeq(
+      [['D', 4], ['A', 4], ['Bm', 4], ['G', 4], ['D', 4], ['A', 4], ['G', 4], ['D', 4]],
+      { pattern: 'D-DU-UDU' },
+    ),
+  },
+
+  /* ------------------------------------------------------------ campfire */
+  'camp-kumbaya': {
+    title: 'Kumbaya',
+    subtitle: 'Traditional (public domain)',
+    kind: 'song',
+    level: 3,
+    bpm: 92,
+    difficulty: 1,
+    tags: ['campfire', 'chords', 'traditional'],
+    about: 'Three chords, one campfire, everyone sings. G, C and D, one bar each.',
+    make: chordSeq(
+      [['G', 4], ['C', 4], ['G', 4], ['D', 4], ['G', 4], ['C', 4], ['G', 4], ['D', 4]],
+      { pattern: 'DDUD' },
+    ),
+  },
+  'camp-she-ll-be-comin': {
+    title: "She'll Be Coming Round the Mountain",
+    subtitle: 'Traditional (public domain)',
+    kind: 'song',
+    level: 3,
+    bpm: 108,
+    difficulty: 1,
+    tags: ['campfire', 'chords', 'traditional'],
+    about: 'A call-and-response singalong. G and C, with D7 for the turnaround.',
+    make: chordSeq(
+      [['G', 4], ['G', 4], ['C', 4], ['G', 4], ['D7', 4], ['D7', 4], ['G', 4], ['G', 4]],
+      { pattern: 'DDUD' },
+    ),
+  },
+  'camp-oh-susanna': {
+    title: 'Oh! Susanna',
+    subtitle: 'Stephen Foster, 1848 (public domain)',
+    kind: 'song',
+    level: 4,
+    bpm: 116,
+    difficulty: 2,
+    tags: ['campfire', 'chords', 'traditional'],
+    about: 'Two chords the whole way through. The strum is the whole song — keep the wrist loose.',
+    make: chordSeq(
+      [['C', 4], ['C', 4], ['G7', 4], ['G7', 4], ['C', 4], ['C', 4], ['G7', 4], ['C', 4]],
+      { pattern: 'DDUD' },
+    ),
+  },
+  'camp-home-range': {
+    title: 'Home on the Range',
+    subtitle: 'Traditional (public domain)',
+    kind: 'song',
+    level: 4,
+    bpm: 96,
+    difficulty: 2,
+    tags: ['campfire', 'chords', 'traditional'],
+    about: 'A slow singalong. G, C and D7 — the same three chords as most campfire songs.',
+    make: chordSeq(
+      [['G', 4], ['C', 4], ['G', 4], ['D7', 4], ['G', 4], ['C', 4], ['D7', 4], ['G', 4]],
+      { pattern: 'DDUD' },
+    ),
+  },
+  'camp-railroad': {
+    title: "I've Been Working on the Railroad",
+    subtitle: 'Traditional (public domain)',
+    kind: 'song',
+    level: 4,
+    bpm: 112,
+    difficulty: 2,
+    tags: ['campfire', 'chords', 'traditional'],
+    about: 'The one everybody knows the words to. C and G7, straight down-up strums.',
+    make: chordSeq(
+      [['C', 4], ['C', 4], ['C', 4], ['G7', 4], ['C', 4], ['C', 4], ['G7', 4], ['C', 4]],
+      { pattern: 'DDUD' },
+    ),
+  },
+};
+
+Object.assign(SPECS, SONG_SPECS, DRUM_SPECS);
+
 /* -------------------------------------------------------- public API */
 
 const cache = new Map();
@@ -785,6 +1077,7 @@ export function getTrack(id) {
       about: spec.about || '',
       notes: built.notes || [],
       chords: built.chords || [],
+      drums: built.drums || [],
       tuningId: built.tuningId || 'standard',
       mode: built.mode,
     });
@@ -817,6 +1110,7 @@ export const LEVELS = [
     missions: [
       { title: 'Open strings', theme: 'rhythm', items: ['drill-open-e', 'drill-open-strings'] },
       { title: 'Keep time', theme: 'rhythm', items: ['drill-eighths', 'riff-first-pulse'] },
+      { title: 'First beat', theme: 'rhythm', items: ['drums-basic'] },
     ],
   },
   {
@@ -837,6 +1131,7 @@ export const LEVELS = [
     missions: [
       { title: 'Cowboy chords', theme: 'rhythm', items: ['drill-em-am', 'drill-em-g'] },
       { title: 'Play a song', theme: 'rhythm', items: ['drill-c-g', 'song-rising-sun'] },
+      { title: 'Around the campfire', theme: 'rhythm', items: ['camp-kumbaya', 'camp-she-ll-be-comin'] },
     ],
   },
   {
@@ -847,6 +1142,11 @@ export const LEVELS = [
     missions: [
       { title: 'Changes', theme: 'rhythm', items: ['drill-four-chords', 'drill-strum-eighths'] },
       { title: 'Melodies in G and A', theme: 'lead', items: ['song-amazing-grace', 'song-greensleeves'] },
+      {
+        title: 'Singalong strums',
+        theme: 'rhythm',
+        items: ['camp-oh-susanna', 'camp-home-range', 'camp-railroad'],
+      },
     ],
   },
   {
@@ -857,26 +1157,29 @@ export const LEVELS = [
     missions: [
       { title: 'The five-note scale', theme: 'lead', items: ['drill-a-pentatonic', 'riff-blues-a'] },
       { title: 'Riff and melody', theme: 'lead', items: ['riff-rock-em', 'song-scarborough'] },
+      { title: 'Turn it up', theme: 'lead', items: ['riff-redline', 'riff-highway-fire'] },
     ],
   },
   {
     n: 6,
     name: 'Lead',
     theme: 'Riffs & lead',
-    blurb: 'Picking discipline, position shifts, and playing in tune by ear.',
+    blurb: 'Picking discipline, position shifts, and time on the kit.',
     missions: [
       { title: 'Picking', theme: 'lead', items: ['drill-alt-picking', 'drill-octave-leap'] },
       { title: 'Moving around the neck', theme: 'lead', items: ['song-morning-line'] },
+      { title: 'On the kit', theme: 'rhythm', items: ['drums-four-floor', 'drums-punk'] },
     ],
   },
   {
     n: 7,
     name: 'Barre chords',
     theme: 'Chords',
-    blurb: 'The shape that turns one chord into twelve.',
+    blurb: 'The shape that turns one chord into twelve, and the quiet stuff.',
     missions: [
       { title: 'Barre', theme: 'rhythm', items: ['drill-barre', 'drill-sus'] },
       { title: 'Fingerstyle first', theme: 'lead', items: ['song-spanish-study'] },
+      { title: 'Love songs', theme: 'rhythm', items: ['song-slow-burn', 'song-only-you'] },
     ],
   },
   {
@@ -887,6 +1190,7 @@ export const LEVELS = [
     missions: [
       { title: 'Independence', theme: 'lead', items: ['drill-travis', 'drill-em-arpeggio'] },
       { title: 'Classical theme', theme: 'lead', items: ['song-fur-elise'] },
+      { title: 'Picked ballads', theme: 'lead', items: ['song-lamplight', 'song-water-is-wide'] },
     ],
   },
   {
@@ -897,6 +1201,7 @@ export const LEVELS = [
     missions: [
       { title: 'Off the beat', theme: 'rhythm', items: ['drill-syncopation', 'riff-funk-e'] },
       { title: 'Dance forms', theme: 'lead', items: ['song-minuet-g'] },
+      { title: 'Fills and feel', theme: 'rhythm', items: ['drums-fill', 'drums-half-time'] },
     ],
   },
   {
@@ -906,6 +1211,7 @@ export const LEVELS = [
     blurb: 'Longer pieces that use the whole toolkit.',
     missions: [
       { title: 'Two full songs', theme: 'lead', items: ['song-neon-corridor', 'song-midnight-blues'] },
+      { title: 'Rock and blues', theme: 'lead', items: ['song-static-bloom', 'riff-deep-water'] },
       { title: 'Speed', theme: 'lead', items: ['drill-speed-burst'] },
     ],
   },
