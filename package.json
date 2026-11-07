@@ -1,0 +1,19 @@
+{
+  "name": "biodynamx-music",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Bio Dynamx Music — guitar practice that starts the second you open it. No account, no subscription, no build step.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "serve": "node tools/serve.mjs --host 0.0.0.0",
+    "test:pitch": "node tools/pitch-test.mjs",
+    "test:content": "node tools/content-test.mjs",
+    "test": "node tools/pitch-test.mjs && node tools/content-test.mjs",
+    "icons": "python tools/make_icons.py"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

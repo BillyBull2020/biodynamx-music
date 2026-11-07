@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"
+    />
+    <title>Bio Dynamx Music</title>
+    <meta name="description" content="Pick up a guitar and start practicing. No account, no subscription, no setup." />
+    <meta name="theme-color" content="#0B1D3A" />
+    <meta name="color-scheme" content="dark" />
+
+    <!-- iOS standalone -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Bio Dynamx" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+  <body>
+    <div id="app" class="app">
+      <div class="boot">
+        <div class="boot-logo">BIO<span>DYNAMX</span></div>
+        <div class="boot-sub">MUSIC</div>
+      </div>
+    </div>
+    <div id="toast-host" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+    <div id="modal-host" class="modal-host" hidden></div>
+    <!-- Fallback for browsers with JavaScript disabled, and a clear smoke-test target. -->
+    <noscript>Bio Dynamx Music needs JavaScript and microphone access to grade what you play.</noscript>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

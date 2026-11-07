@@ -1,0 +1,22 @@
+{
+  "name": "biodynamx-music-native",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Capacitor shell for Bio Dynamx Music",
+  "type": "module",
+  "scripts": {
+    "prepare:web": "node ../prepare.mjs",
+    "sync": "node ../prepare.mjs && cap sync",
+    "android": "cap open android",
+    "ios": "cap open ios",
+    "build:android": "cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}

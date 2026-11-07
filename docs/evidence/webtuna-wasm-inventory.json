@@ -1,0 +1,292 @@
+﻿{
+ "path": "C:\\Users\\billy\\AppData\\Local\\Temp\\bdm-rea\\webtuna\\WebTuna.wasm",
+ "bytes": 296937,
+ "wasm_version": 1,
+ "sections": [
+  {
+   "id": 1,
+   "name": "type",
+   "size": 676,
+   "off": 11
+  },
+  {
+   "id": 2,
+   "name": "import",
+   "size": 175,
+   "off": 690
+  },
+  {
+   "id": 3,
+   "name": "function",
+   "size": 741,
+   "off": 868
+  },
+  {
+   "id": 4,
+   "name": "table",
+   "size": 7,
+   "off": 1611
+  },
+  {
+   "id": 5,
+   "name": "memory",
+   "size": 7,
+   "off": 1620
+  },
+  {
+   "id": 6,
+   "name": "global",
+   "size": 8,
+   "off": 1629
+  },
+  {
+   "id": 7,
+   "name": "export",
+   "size": 32,
+   "off": 1639
+  },
+  {
+   "id": 9,
+   "name": "element",
+   "size": 816,
+   "off": 1674
+  },
+  {
+   "id": 12,
+   "name": "datacount",
+   "size": 1,
+   "off": 2492
+  },
+  {
+   "id": 10,
+   "name": "code",
+   "size": 261469,
+   "off": 2497
+  },
+  {
+   "id": 11,
+   "name": "data",
+   "size": 32967,
+   "off": 263970
+  }
+ ],
+ "imports": [
+  {
+   "module": "a",
+   "name": "a",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "b",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "c",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "d",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "e",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "f",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "g",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "h",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "i",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "j",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "k",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "l",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "m",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "n",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "o",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "p",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "q",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "r",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "s",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "t",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "u",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "v",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "w",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "x",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "y",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "z",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "A",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "B",
+   "kind": 0
+  },
+  {
+   "module": "a",
+   "name": "C",
+   "kind": 0
+  }
+ ],
+ "exports": [
+  {
+   "name": "D",
+   "kind": 2,
+   "index": 0
+  },
+  {
+   "name": "E",
+   "kind": 0,
+   "index": 767
+  },
+  {
+   "name": "F",
+   "kind": 0,
+   "index": 705
+  },
+  {
+   "name": "G",
+   "kind": 0,
+   "index": 29
+  },
+  {
+   "name": "H",
+   "kind": 0,
+   "index": 35
+  },
+  {
+   "name": "I",
+   "kind": 1,
+   "index": 0
+  },
+  {
+   "name": "J",
+   "kind": 0,
+   "index": 536
+  }
+ ],
+ "export_count": 7,
+ "function_kind_exports": [
+  "E",
+  "F",
+  "G",
+  "H",
+  "J"
+ ],
+ "mangled_sample": [],
+ "mangled_count": 0,
+ "yousician_items": [
+  "Yousician",
+  "Yousician10ArraySliceIKdLm1EEE",
+  "Yousician10ArraySliceIKfLm1EEE",
+  "Yousician10ArraySliceIKiLm1EEE",
+  "Yousician10ArraySliceIfLm16EEE",
+  "Yousician10ArraySliceIfLm1EEE",
+  "Yousician10ArraySliceIfLm2EEE",
+  "Yousician10ArraySliceIfLm4EEE",
+  "Yousician10ArraySliceIfLm8EEE",
+  "Yousician10ArraySliceIiLm1EEE",
+  "Yousician10ArraySliceIiLm2EEE",
+  "Yousician10ArraySliceIiLm4EEE",
+  "Yousician15OwnedArraySliceIfLm16EEE",
+  "Yousician15OwnedArraySliceIfLm4EEE",
+  "Yousician15OwnedArraySliceIiLm4EEE",
+  "Yousician19OwnedArraySliceBaseIfEE",
+  "Yousician19OwnedArraySliceBaseIiEE",
+  "Yousician1v23VectorPrimitiveFallbackE",
+  "Yousician1v24VectorPrimitiveInterfaceE",
+  "Yousician7FFTBase9FFTBufferE",
+  "Yousician7FFTBaseE",
+  "Yousician9Ooura_FFTE"
+ ],
+ "audioish_exports": []
+}
