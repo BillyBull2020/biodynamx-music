@@ -16,7 +16,7 @@
  */
 
 import { parseTab } from '../music/tab.js';
-import { CHORDS } from '../music/theory.js';
+import { lookupChord } from '../music/theory.js';
 
 const DEFAULT_BEATS = 4;
 
@@ -34,7 +34,7 @@ export function parseChordLine(text, { beatsPerBar = 4 } = {}) {
     const [rawName, rawBeats] = token.split(':');
     const name = rawName.trim();
     const beats = Number(rawBeats) > 0 ? Number(rawBeats) : DEFAULT_BEATS;
-    const shape = CHORDS[name];
+    const shape = lookupChord(name);
     if (!shape) {
       unknown.push(name);
       continue;

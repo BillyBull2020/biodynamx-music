@@ -228,7 +228,12 @@ export function customSong(id) {
 export function addCustomSong(song) {
   const s = load();
   if (!Array.isArray(s.customSongs)) s.customSongs = [];
-  s.customSongs = [song, ...s.customSongs.filter((c) => c.id !== song.id)];
+  // Re-pasting a list should update, not stack duplicates: match on title.
+  const title = String(song.title || '').trim().toLowerCase();
+  s.customSongs = [
+    song,
+    ...s.customSongs.filter((c) => c.id !== song.id && String(c.title || '').trim().toLowerCase() !== title),
+  ];
   flush();
   return song;
 }
