@@ -37,6 +37,11 @@ such. No claim here is a guess about native code.
 The sister property **GuitarTuna does ship a real-time audio engine on the web**.
 That turned out to be the most valuable target on the site.
 
+**A note on drums.** Yousician teaches **guitar, piano, ukulele, bass and
+singing** — there is no drum instrument anywhere in the product, on the site or in
+the support documentation. Any drum feature in Bio Dynamx Music is therefore
+original work, not a reconstruction of something observed here.
+
 ---
 
 ## 2. Evidence captured
@@ -216,8 +221,9 @@ drops the business model:
 | --- | --- |
 | Account + subscription, 7-day trial | No account, no payment, nothing to sign up for |
 | Native apps only | Installable PWA, one URL, works on Android and iOS; optional native shells in `native/` |
-| 10,000+ licensed songs | 12 public-domain / original pieces + 23 drills, all legal to ship |
-| Proprietary engine, origin-locked | Independent YIN + inharmonicity-aware spectral refinement, ~0.03 cent accuracy on the test bench, no lock |
+| 10,000+ licensed songs | 22 public-domain / original songs + 31 drills, all legal to ship |
+| Five instruments: guitar, piano, ukulele, bass, singing | Guitar, plus **drums** — which Yousician does not teach at all |
+| Proprietary engine, origin-locked | Independent YIN + inharmonicity-aware spectral refinement (~0.03 cent accuracy on the test bench) and a separate spectral-flux onset detector for drums; no lock |
 | Live backing tracks streamed | Drums, bass and click synthesised at runtime — offline, zero assets |
 
 ---

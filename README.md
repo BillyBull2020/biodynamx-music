@@ -9,7 +9,10 @@ you kept time.
 Built for Android and Apple devices as an installable web app (PWA), with a
 Capacitor shell in [`native/`](native/) if you want a real `.apk` / `.ipa`.
 
+Guitar **and drums** — with rock, love and campfire songs.
+
 ![Home screen](shots/home.png)
+![Drum chart](shots/drums-3000ms.png)
 
 ---
 

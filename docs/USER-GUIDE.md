@@ -64,9 +64,41 @@ so a lesson can never trap you.
 | --- | --- |
 | **Play** | Daily session, riff of the day, quick tools, whatever you were last practising. |
 | **Learn** | The 10-level path. Missions contain 2–3 tasks. Level 1 is open strings; level 10 is full pieces. |
-| **Songs** | Everything in one list, filterable by songs / riffs / chords / drills. |
+| **Songs** | Everything in one list, filterable by **Rock**, **Campfire**, **Love**, **Drums**, riffs and drills. |
 | **Tools** | Tuner, metronome, ear trainer, fretboard quiz, scale checker. All work without a song. |
 | **You** | Stats, difficulty, tuning, volume, latency calibration, export/reset. |
+
+---
+
+## Drums
+
+Drum charts work differently from guitar pieces, so a few things are worth
+knowing:
+
+- They are graded on **when you hit**, not what note you played. A drum kit is not
+  pitched in any useful way through a phone microphone.
+- You can play them **on a real kit** near the microphone, or **tap the four pads**
+  at the bottom of the screen. The pads are the reliable option on a phone, and
+  they always work.
+- The lanes are **K**ick, **S**nare, **H**at and **T**om. One physical hit can
+  satisfy more than one lane at once when a chart puts a kick and a hat together.
+- Practice mode waits for you here too, so you can learn a beat at half speed and
+  build up.
+
+Start with **First beat** (level 1). It is the same kick-snare-hat pattern behind
+most of the rock and pop you have ever heard.
+
+---
+
+## Campfire and love songs
+
+The **Campfire** filter is five traditional singalongs that use three chords at
+most — Kumbaya, She'll Be Coming Round the Mountain, Oh! Susanna, Home on the
+Range and I've Been Working on the Railroad. They are chord charts on purpose:
+the point is to strum and sing, not to read a melody.
+
+**Love** is Slow Burn, Only You, Lamplight and The Water Is Wide — slower tempos,
+softer strums, and one fingerpicked piece.
 
 ---
 
