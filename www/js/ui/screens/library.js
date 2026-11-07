@@ -8,6 +8,8 @@
 
 import { el, icon } from '../../util/dom.js';
 import { itemProgress, customSong, removeCustomSong } from '../../util/storage.js';
+import { appContext, configureAudioSession } from '../../audio/engine.js';
+import { Band } from '../../audio/band.js';
 import { allItems, getTrack } from '../../content/library.js';
 import { backButton, pill, starsEl, topbar } from '../components.js';
 
@@ -181,6 +183,40 @@ export function itemScreen({ params, navigate, present }) {
   const prog = itemProgress(params.id);
   const mine = customSong(params.id);
 
+  // Hear it before you try it: one tap, whole arrangement, no chart reading.
+  let band = null;
+  let playing = null;
+  const listenBtn = el('button.btn.btn--block', { type: 'button' }, [icon('speaker', 16), el('span', { text: 'Listen' })]);
+  listenBtn.addEventListener('click', async () => {
+    if (playing) {
+      playing.stop();
+      playing = null;
+      listenBtn.lastChild.textContent = 'Listen';
+      return;
+    }
+    try {
+      configureAudioSession();
+      const ctx = await appContext();
+      if (!band) band = new Band(ctx);
+      band.setVolume(0.5);
+      const handle = band.playSequence(
+        t.events.map((e) => ({ beat: e.beat, midis: e.midis, durBeats: e.durBeats })),
+        t.bpm,
+      );
+      playing = handle;
+      listenBtn.lastChild.textContent = 'Stop';
+      setTimeout(() => {
+        if (playing === handle) {
+          handle.stop();
+          playing = null;
+          listenBtn.lastChild.textContent = 'Listen';
+        }
+      }, handle.duration * 1000 + 200);
+    } catch {
+      listenBtn.lastChild.textContent = 'Listen';
+    }
+  });
+
   const facts = el('div.result__grid', { style: { maxWidth: 'none', marginBottom: '4px' } }, [
     el('div.result__cell', {}, [el('b', { text: String(t.events.length) }), el('span', { text: 'notes' })]),
     el('div.result__cell', {}, [el('b', { text: `${t.bpm}` }), el('span', { text: 'BPM' })]),
@@ -217,6 +253,7 @@ export function itemScreen({ params, navigate, present }) {
         { type: 'button', onclick: () => navigate(`/play/${t.id}?mode=play`) },
         [icon('songs', 18), 'Play at full tempo for stars'],
       ),
+      listenBtn,
       mine
         ? el('button.btn.btn--danger.btn--block', {
             type: 'button',

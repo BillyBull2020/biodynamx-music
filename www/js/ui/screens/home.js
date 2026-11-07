@@ -29,6 +29,34 @@ export function homeScreen({ navigate, present }) {
   const drumCount = everyItem.filter((i) => i.kind === 'drums').length;
   const guitarCount = everyItem.length - drumCount;
 
+  // iOS gives no beforeinstallprompt, so tell the player once how to get the
+  // app onto the home screen — that is the difference between "a website" and
+  // "the app I open every day".
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const iosHint =
+    isIOS && !standalone && !localStorage.getItem('bdm.iosHintDismissed')
+      ? el('div.card', { style: { marginTop: '12px', borderColor: 'rgba(0,212,255,0.35)' } }, [
+          el('div.hstack', {}, [
+            el('b', { text: 'Put this on your home screen' }),
+            el('span.spacer'),
+            el('button', {
+              type: 'button',
+              text: '×',
+              style: { color: 'var(--muted)', fontSize: '18px', lineHeight: '1' },
+              onclick: (ev) => {
+                localStorage.setItem('bdm.iosHintDismissed', '1');
+                ev.currentTarget.closest('.card').remove();
+              },
+            }),
+          ]),
+          el('p.sub', {
+            style: { marginTop: '6px', marginBottom: 0 },
+            text: 'Tap Share, then "Add to Home Screen". It opens full screen like a real app and works with no signal.',
+          }),
+        ])
+      : null;
+
   const node = el('div.fade-in', {}, [
     el('div.hero', {}, [
       el('div.hero__glow'),
@@ -60,6 +88,7 @@ export function homeScreen({ navigate, present }) {
       ]),
     ]),
 
+    iosHint,
     el('div.card', { style: { marginTop: '12px' } }, [
       el('div.hstack', {}, [
         el('div.row__main', {}, [

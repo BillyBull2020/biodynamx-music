@@ -69,6 +69,17 @@ export class InputEngine {
     return this.ctx;
   }
 
+  /** Has the browser already granted microphone access for this origin? */
+  async permissionState() {
+    try {
+      if (!navigator.permissions?.query) return 'unknown';
+      const status = await navigator.permissions.query({ name: 'microphone' });
+      return status.state;
+    } catch {
+      return 'unknown';
+    }
+  }
+
   async listDevices() {
     if (!navigator.mediaDevices?.enumerateDevices) return [];
     try {

@@ -6,7 +6,7 @@
  * is picked up on the next launch (bump VERSION when shipping).
  */
 
-const VERSION = 'bdm-v6';
+const VERSION = 'bdm-v7';
 const SHELL = [
   './',
   'index.html',

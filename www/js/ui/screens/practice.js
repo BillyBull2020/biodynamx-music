@@ -64,7 +64,7 @@ export function practiceScreen({ params, query, navigate, present, shell }) {
     footInfo,
     el('button.btn.btn--sm', { type: 'button', onclick: () => changeTempo(0.05), text: '+' }),
     el('button.btn.btn--sm', { type: 'button', onclick: () => toggleWait() }, [icon('loop', 14), 'Wait']),
-    el('button.btn.btn--sm', { type: 'button', onclick: () => previewCurrent(), text: 'Hear it' }),
+    el('button.btn.btn--sm', { type: 'button', onclick: () => toggleListen() }, [icon('speaker', 14), 'Listen']),
   ]);
 
   // Drum kits are graded on attack timing, and a phone microphone in a room with
@@ -145,7 +145,28 @@ export function practiceScreen({ params, query, navigate, present, shell }) {
   // The game owns the whole viewport: its own HUD replaces the app top bar and
   // the tab bar is hidden so nothing competes with the highway.
   present({ node: game, topbar: hud, fullScreen: true });
-  renderGate();
+  /**
+   * Skip the tap when we can. On desktop and Android the permission persists, so
+   * opening a piece goes straight into the count-in; on iOS the first tap of a
+   * session is unavoidable, so the gate is the fallback rather than the default.
+   */
+  async function autoStartIfAllowed() {
+    if (input.running) {
+      gate.remove();
+      const ok = await startRun();
+      if (!ok) renderGate(input.error);
+      return;
+    }
+    const state = await input.permissionState();
+    if (state !== 'granted') {
+      renderGate();
+      return;
+    }
+    gate.remove();
+    const ok = await startRun();
+    if (!ok) renderGate(input.error);
+  }
+  autoStartIfAllowed();
 
   /* ------------------------------------------------------------- lifecycle */
 
@@ -304,6 +325,36 @@ export function practiceScreen({ params, query, navigate, present, shell }) {
     stage.appendChild(pauseOverlay);
   }
 
+  let listenHandle = null;
+
+  /**
+   * Hear the piece before playing it. This is the difference between guessing
+   * and knowing what you are aiming for, so it is one tap away at all times.
+   */
+  function toggleListen() {
+    if (listenHandle) {
+      listenHandle.stop();
+      listenHandle = null;
+      toast('Stopped.', '', 900);
+      return;
+    }
+    if (!band || !input.ctx) {
+      toast('Tap Start practising first, then Listen.', 'warn');
+      return;
+    }
+    if (session && !session.paused && !session.finished) session.pause();
+    const events = track.events.map((e) => ({ beat: e.beat, midis: e.midis, durBeats: e.durBeats }));
+    const tempoNow = tempo;
+    listenHandle = band.playSequence(events, track.bpm * tempoNow);
+    toast(`Playing ${track.title} at ${Math.round(tempoNow * 100)}%…`, '', 1800);
+    setTimeout(() => {
+      if (listenHandle) {
+        listenHandle.stop();
+        listenHandle = null;
+      }
+    }, listenHandle.duration * 1000 + 200);
+  }
+
   const pauseOverlay = el('div', {
     style: {
       position: 'absolute',
@@ -411,6 +462,7 @@ export function practiceScreen({ params, query, navigate, present, shell }) {
 
   return () => {
     destroyed = true;
+    if (listenHandle) listenHandle.stop();
     document.removeEventListener('visibilitychange', onVisibility);
     if (raf) cancelAnimationFrame(raf);
     if (session) session.destroy();
