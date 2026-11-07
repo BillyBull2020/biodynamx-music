@@ -13,6 +13,44 @@ Capacitor shell in [`native/`](native/) if you want a real `.apk` / `.ipa`.
 
 ---
 
+## Live
+
+**<https://billybull2020.github.io/biodynamx-music/>**
+
+That URL is the whole app: open it on a phone, tap **Install** (Android) or
+**Share → Add to Home Screen** (iPhone), and it runs full-screen and offline from
+then on.
+
+---
+
+## Does it work in a browser? Yes — it *is* a browser app
+
+There is no native code and no build step. Everything it needs is standard and
+widely shipped: ES modules, Web Audio, `getUserMedia`, Canvas 2D, service
+workers.
+
+| Browser | Status | Notes |
+| --- | --- | --- |
+| Chrome / Edge 100+ (desktop, Android) | **Verified** | Full run tested end-to-end, including the microphone pipeline |
+| Safari 15+ (macOS) | Expected good | Same WebKit APIs; not machine-tested here |
+| iOS / iPadOS Safari 15.4+ | Expected good | Install via Share → Add to Home Screen; mic requires a tap first (the Start button is that tap) |
+| Firefox 100+ | Expected good | No `beforeinstallprompt`, so no in-app Install chip — use the browser menu. Everything else works |
+| Anything older than ~2021 | No | No ES modules / no `getUserMedia` |
+
+Two hard requirements that are browser rules, not app limitations:
+
+1. **HTTPS or `localhost`.** Microphones are refused on plain `http://` for any
+   other host. GitHub Pages gives you HTTPS for free.
+2. **A user gesture before audio.** iOS will not open an `AudioContext` or the
+   mic without one, which is why the app asks you to tap **Start practising**
+   rather than listening on page load.
+
+Verified on the live URL: secure context, service worker active and 30 files
+precached, manifest valid with all four icons reachable, and a full practice run
+scored 100,000 with 8/8 notes perfect.
+
+---
+
 ## Start it
 
 ```powershell
@@ -29,18 +67,34 @@ ES-module JavaScript with zero npm dependencies.
 
 ## Put it on a phone
 
-Microphones require a **secure context**, so the app has to be served over HTTPS
-(or `localhost`) — that is a browser rule, not a limit of the app.
+Already deployed — just open <https://billybull2020.github.io/biodynamx-music/>:
 
-```powershell
-npx netlify deploy --dir=www --prod     # or any static host, or Cloudflare Pages
-```
-
-- **Android / Chrome:** open the URL → tap **Install** in the header.
-- **iPhone / Safari:** open the URL → **Share** → **Add to Home Screen**.
+- **Android / Chrome:** tap **Install** in the header.
+- **iPhone / Safari:** **Share** → **Add to Home Screen**.
 
 Full-screen, offline-capable, and the icon sits next to your other apps.
 For a native shell, see [`native/README.md`](native/README.md).
+
+### Deploying your own copy
+
+The app is a static folder. Anything that serves `www/` over HTTPS works.
+
+```powershell
+# GitHub Pages (what this repo uses): push to main, .github/workflows/pages.yml
+# publishes www/ automatically.
+
+# Netlify, if you prefer:
+npx netlify deploy --dir=www --prod
+```
+
+The workflow in [`.github/workflows/pages.yml`](.github/workflows/pages.yml)
+uploads `www/` as the Pages artefact. One-time setup on a fresh repo:
+**Settings → Pages → Build and deployment → Source: GitHub Actions**, or:
+
+```powershell
+gh api -X POST /repos/OWNER/REPO/pages -f build_type=workflow
+gh workflow run pages.yml
+```
 
 ---
 
