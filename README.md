@@ -121,18 +121,29 @@ port: drum charts are graded on *attack timing* (spectral flux plus an energy-ri
 gate) instead of pitch, and you can play them on a real kit near the microphone
 **or** on four on-screen pads that always work.
 
-**Ten levels, 53 pieces.** Open strings → first melodies → cowboy chords →
+**Ten levels, 84 pieces.** Open strings → first melodies → cowboy chords →
 the four-chord loop → riffs → lead → barre → fingerstyle → groove → full pieces.
 Nothing is locked; skip ahead whenever you like.
 
-**22 songs and 31 drills**, filterable by **Rock**, **Campfire**, **Love** and
-**Drums**:
+**45 songs and 39 riffs, drills and patterns**, filterable by **Rock**,
+**Campfire**, **Love**, **Folk**, **Classical** and **Drums**:
 
-- *Rock* — Redline (punk), Highway Fire, Deep Water (blues-rock), Static Bloom
-- *Campfire* — Kumbaya, She'll Be Coming Round the Mountain, Oh! Susanna,
-  Home on the Range, I've Been Working on the Railroad
-- *Love* — Slow Burn, Only You, Lamplight, The Water Is Wide
-- *Drums* — First beat, Four on the floor, Fast and loud, Half-time feel, Beat into a fill
+- *Rock* (16) — Redline, Highway Fire, Deep Water, Static Bloom, Blacktop,
+  Northbound, Garage Band, Open Road, Tin Roof
+- *Campfire* (14) — Kumbaya, She'll Be Coming Round the Mountain, Oh! Susanna,
+  Home on the Range, I've Been Working on the Railroad, Down by the Riverside,
+  This Little Light of Mine, Michael Row the Boat Ashore, Swing Low,
+  Wade in the Water, Will the Circle Be Unbroken, I Shall Not Be Moved
+- *Love* (7) — Slow Burn, Only You, Lamplight, The Water Is Wide, Loch Lomond,
+  Drink to Me Only with Thine Eyes, Plaisir d'amour
+- *Folk* (6) — Red River Valley, Banks of the Ohio, Cripple Creek, Wildwood
+  Flower, The Shady Grove, Shenandoah
+- *Classical* (7) — Ode to Joy, Für Elise, Minuet in G, Blue Danube,
+  Morning Mood, Canon in D, broken-chord study
+- *Blues* (6) — Blues shuffle in A, Deep Water, Boogie bass line, Twelve-bar in E,
+  Shuffle in G, Midnight Room
+- *Drums* (8) — First beat, Four on the floor, Fast and loud, Half-time feel,
+  Beat into a fill, Sixteenth hats, Off-beat kick, Soft shuffle
 
 Everything is public domain (Twinkle, Ode to Joy, Greensleeves, Scarborough Fair,
 Amazing Grace, House of the Rising Sun, Für Elise, Minuet in G, and the

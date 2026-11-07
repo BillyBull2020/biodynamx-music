@@ -92,13 +92,20 @@ most of the rock and pop you have ever heard.
 
 ## Campfire and love songs
 
-The **Campfire** filter is five traditional singalongs that use three chords at
-most — Kumbaya, She'll Be Coming Round the Mountain, Oh! Susanna, Home on the
-Range and I've Been Working on the Railroad. They are chord charts on purpose:
-the point is to strum and sing, not to read a melody.
+The **Campfire** filter is a dozen traditional singalongs that use three chords
+at most — Kumbaya, She'll Be Coming Round the Mountain, Oh! Susanna, Home on the
+Range, I've Been Working on the Railroad, Down by the Riverside, This Little
+Light of Mine, Michael Row the Boat Ashore, Swing Low, Wade in the Water, Will
+the Circle Be Unbroken and I Shall Not Be Moved. They are chord charts on
+purpose: the point is to strum and sing, not to read a melody.
 
-**Love** is Slow Burn, Only You, Lamplight and The Water Is Wide — slower tempos,
-softer strums, and one fingerpicked piece.
+There is also a **Folk** filter (Red River Valley, Banks of the Ohio, Cripple
+Creek, Wildwood Flower, The Shady Grove, Shenandoah) and **Classical** (Ode to
+Joy, Für Elise, Minuet in G, Blue Danube, Morning Mood, Canon in D).
+
+**Love** is Slow Burn, Only You, Lamplight, The Water Is Wide, Loch Lomond,
+Drink to Me Only with Thine Eyes and Plaisir d'amour — slower tempos, softer
+strums, and a couple of fingerpicked pieces.
 
 ---
 

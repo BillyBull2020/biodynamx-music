@@ -5,7 +5,7 @@
 
 import { el, icon } from '../../util/dom.js';
 import { get, itemProgress } from '../../util/storage.js';
-import { getTrack, nextRecommendation, pathItemIds, riffOfTheDay, songs } from '../../content/library.js';
+import { allItems, getTrack, nextRecommendation, pathItemIds, riffOfTheDay } from '../../content/library.js';
 import { backButton, progressBar, settingsButton, starsEl, streakChip, tile, topbar } from '../components.js';
 
 export function homeScreen({ navigate, present }) {
@@ -24,6 +24,10 @@ export function homeScreen({ navigate, present }) {
 
   const totalStars = Object.values(state.items || {}).reduce((n, it) => n + (it.stars || 0), 0);
   const pathStars = pathItemIds().reduce((n, id) => n + (itemProgress(id).stars || 0), 0);
+
+  const everyItem = allItems();
+  const drumCount = everyItem.filter((i) => i.kind === 'drums').length;
+  const guitarCount = everyItem.length - drumCount;
 
   const node = el('div.fade-in', {}, [
     el('div.hero', {}, [
@@ -88,6 +92,27 @@ export function homeScreen({ navigate, present }) {
       el('span', { style: { color: 'var(--muted-2)', display: 'flex' } }, [icon('next', 16)]),
     ]),
 
+    // Instruments get their own door, not a filter chip three taps away.
+    el('div.section-head', {}, [el('h2', { text: 'Play' }), el('span.sub', { text: 'pick your instrument' })]),
+    el('div.vstack', { style: { gap: '8px' } }, [
+      el('button.row', { type: 'button', onclick: () => navigate('/songs') }, [
+        el('div.row__badge', {}, [icon('songs', 16)]),
+        el('div.row__main', {}, [
+          el('div.row__title', { text: 'Guitar' }),
+          el('div.row__meta', { text: `${guitarCount} songs, riffs and drills · rock, campfire, love` }),
+        ]),
+        el('span', { style: { color: 'var(--muted-2)', display: 'flex' } }, [icon('next', 16)]),
+      ]),
+      el('button.row', { type: 'button', onclick: () => navigate('/drums') }, [
+        el('div.row__badge', { text: 'K' }),
+        el('div.row__main', {}, [
+          el('div.row__title', { text: 'Drums' }),
+          el('div.row__meta', { text: `${drumCount} beats · tap the pads or play a real kit` }),
+        ]),
+        el('span', { style: { color: 'var(--muted-2)', display: 'flex' } }, [icon('next', 16)]),
+      ]),
+    ]),
+
     el('div.section-head', {}, [el('h2', { text: 'Quick tools' }), el('span.sub', { text: 'no song needed' })]),
     el('div.tiles', {}, [
       tile({ title: 'Tuner', meta: 'Tune up first', iconName: 'tuner', onClick: () => navigate('/tuner') }),
@@ -117,7 +142,7 @@ export function homeScreen({ navigate, present }) {
       el('div.row__badge', { text: '10' }),
       el('div.row__main', {}, [
         el('div.row__title', { text: 'Learning path' }),
-        el('div.row__meta', { text: `${pathStars} of ${pathItemIds().length * 3} stars earned · ${songs().length} songs` }),
+        el('div.row__meta', { text: `${pathStars} of ${pathItemIds().length * 3} stars earned · ${pathItemIds().length} tasks` }),
       ]),
       el('span', { style: { color: 'var(--muted-2)', display: 'flex' } }, [icon('next', 16)]),
     ]),

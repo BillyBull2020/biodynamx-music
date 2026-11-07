@@ -17,6 +17,7 @@ import { TUNINGS } from '../../music/theory.js';
 import { appContext, configureAudioSession, sharedInput } from '../../audio/engine.js';
 import { Band } from '../../audio/band.js';
 import { backButton, progressBar, segmented, starsEl, topbar } from '../components.js';
+import { VERSION_LABEL } from '../../version.js';
 
 export function youScreen({ navigate, present }) {
   const s = get();
@@ -186,6 +187,26 @@ export function youScreen({ navigate, present }) {
       style: { textAlign: 'center', marginTop: '22px', lineHeight: '1.6' },
       text: 'Bio Dynamx Music · no account, no subscription, nothing leaves this device. All songs are public domain or written for this app.',
     }),
+    el('div.center', { style: { marginTop: '12px' } }, [el('span.pill', { text: VERSION_LABEL })]),
+    el('div.center', { style: { marginTop: '8px' } }, [
+      el('button.btn.btn--sm.btn--ghost', {
+        type: 'button',
+        text: 'Check for updates',
+        onclick: async () => {
+          try {
+            const reg = await navigator.serviceWorker?.getRegistration();
+            if (!reg) {
+              toast('Not installed as an app, so this copy always loads fresh.', '', 3400);
+              return;
+            }
+            await reg.update();
+            toast('Checked. If a newer version exists a Reload banner appears.', 'ok', 3600);
+          } catch {
+            toast('Could not check for updates.', 'warn');
+          }
+        },
+      }),
+    ]),
   ]);
 
   present({ tab: '/you', topbar: topbar({ brand: true }), node });

@@ -221,7 +221,7 @@ drops the business model:
 | --- | --- |
 | Account + subscription, 7-day trial | No account, no payment, nothing to sign up for |
 | Native apps only | Installable PWA, one URL, works on Android and iOS; optional native shells in `native/` |
-| 10,000+ licensed songs | 22 public-domain / original songs + 31 drills, all legal to ship |
+| 10,000+ licensed songs | 45 public-domain / original songs + 39 riffs and drills, all legal to ship |
 | Five instruments: guitar, piano, ukulele, bass, singing | Guitar, plus **drums** — which Yousician does not teach at all |
 | Proprietary engine, origin-locked | Independent YIN + inharmonicity-aware spectral refinement (~0.03 cent accuracy on the test bench) and a separate spectral-flux onset detector for drums; no lock |
 | Live backing tracks streamed | Drums, bass and click synthesised at runtime — offline, zero assets |

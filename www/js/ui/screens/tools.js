@@ -25,6 +25,7 @@ export function toolsScreen({ navigate, present }) {
       tile({ title: 'Ear trainer', meta: 'Intervals by sound', iconName: 'ear', onClick: () => navigate('/ear') }),
       tile({ title: 'Fretboard quiz', meta: 'Name the note', iconName: 'fretboard', onClick: () => navigate('/fretboard') }),
       tile({ title: 'Scale check', meta: 'Play any scale', iconName: 'scale', onClick: () => navigate('/scale') }),
+      tile({ title: 'Drums', meta: 'Play the kit', iconName: 'metronome', onClick: () => navigate('/drums') }),
     ]),
     el('div.card', { style: { marginTop: '16px' } }, [
       el('div.hstack', {}, [icon('mic', 18), el('b', { text: 'Getting a good sound' })]),

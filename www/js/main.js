@@ -9,9 +9,11 @@ import { el, icon, toast } from './util/dom.js';
 import { get, onChange, rollDay } from './util/storage.js';
 import { define, mount, navigate, start, back } from './ui/router.js';
 import { tabbar } from './ui/components.js';
+import { APP_VERSION } from './version.js';
 import { homeScreen } from './ui/screens/home.js';
 import { learnScreen, levelScreen } from './ui/screens/learn.js';
 import { songsScreen, itemScreen } from './ui/screens/library.js';
+import { drumsScreen } from './ui/screens/drums.js';
 import { practiceScreen } from './ui/screens/practice.js';
 import {
   earScreen,
@@ -60,6 +62,7 @@ define('/home', wrap(homeScreen));
 define('/learn', wrap(learnScreen));
 define('/level/:n', wrap(levelScreen));
 define('/songs', wrap(songsScreen));
+define('/drums', wrap(drumsScreen));
 define('/item/:id', wrap(itemScreen));
 define('/play/:id', wrap(practiceScreen));
 define('/tools', wrap(toolsScreen));
@@ -73,6 +76,26 @@ define('/calibrate', wrap(calibrateScreen));
 define('/settings', wrap(youScreen));
 
 /* -------------------------------------------------------------- install UX */
+
+/**
+ * Persistent "new version" banner. A toast is too easy to miss, and an installed
+ * copy can otherwise sit on an old build for weeks.
+ */
+function showUpdateBanner() {
+  if (document.getElementById('update-banner')) return;
+  const banner = el('div.update-banner', { id: 'update-banner', role: 'status' }, [
+    el('div.update-banner__text', {}, [
+      el('b', { text: 'A new version is ready' }),
+      el('span', { text: ` You are on an older build. Reload to get v${APP_VERSION}.` }),
+    ]),
+    el('button.btn.btn--sm.btn--primary', {
+      type: 'button',
+      text: 'Reload',
+      onclick: () => location.reload(),
+    }),
+  ]);
+  document.body.appendChild(banner);
+}
 
 let installEvent = null;
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -146,14 +169,23 @@ async function boot() {
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     try {
       const reg = await navigator.serviceWorker.register('sw.js', { scope: './' });
+
+      // A new version is installed but the page is still running the old one.
+      // Say so loudly and offer the one tap that fixes it — a silent toast is
+      // how a whole feature can ship without anyone seeing it.
+      const announce = () => showUpdateBanner();
+      if (reg.waiting && navigator.serviceWorker.controller) announce();
       reg.addEventListener('updatefound', () => {
         const worker = reg.installing;
         if (!worker) return;
         worker.addEventListener('statechange', () => {
-          if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-            toast('An update is ready. Close and reopen the app to load it.', '', 5000);
-          }
+          if (worker.state === 'installed' && navigator.serviceWorker.controller) announce();
         });
+      });
+      // Also re-check when the app comes back to the foreground.
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        reg.update().catch(() => {});
       });
     } catch (err) {
       console.warn('Service worker registration failed', err);
