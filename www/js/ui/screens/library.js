@@ -16,6 +16,9 @@ const FILTERS = [
   { id: 'campfire', label: 'Campfire' },
   { id: 'love', label: 'Love' },
   { id: 'drums', label: 'Drums' },
+  { id: 'folk', label: 'Folk' },
+  { id: 'classical', label: 'Classical' },
+  { id: 'blues', label: 'Blues' },
   { id: 'riff', label: 'Riffs' },
   { id: 'drill', label: 'Drills' },
 ];
