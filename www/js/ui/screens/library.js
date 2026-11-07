@@ -15,6 +15,7 @@ import { backButton, pill, starsEl, topbar } from '../components.js';
 const FILTERS = [
   { id: 'all', label: 'All' },
   { id: 'mine', label: 'Mine' },
+  { id: 'progression', label: 'Progressions' },
   { id: 'campfire', label: 'Campfire' },
   { id: 'rock', label: 'Rock' },
   { id: 'love', label: 'Love' },

@@ -15,6 +15,7 @@ import { learnScreen, levelScreen } from './ui/screens/learn.js';
 import { songsScreen, itemScreen } from './ui/screens/library.js';
 import { drumsScreen } from './ui/screens/drums.js';
 import { addSongScreen } from './ui/screens/add-song.js';
+import { progressionsScreen } from './ui/screens/progressions.js';
 import { practiceScreen } from './ui/screens/practice.js';
 import {
   earScreen,
@@ -65,6 +66,7 @@ define('/level/:n', wrap(levelScreen));
 define('/songs', wrap(songsScreen));
 define('/drums', wrap(drumsScreen));
 define('/add', wrap(addSongScreen));
+define('/progressions', wrap(progressionsScreen));
 define('/item/:id', wrap(itemScreen));
 define('/play/:id', wrap(practiceScreen));
 define('/tools', wrap(toolsScreen));

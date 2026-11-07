@@ -7,7 +7,7 @@
  * shipped without anyone being able to find it.
  */
 
-export const APP_VERSION = '6';
+export const APP_VERSION = '7';
 export const APP_BUILD = '2026-11-08';
 
 export const VERSION_LABEL = `v${APP_VERSION} · ${APP_BUILD}`;

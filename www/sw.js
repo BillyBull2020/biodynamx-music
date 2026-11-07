@@ -6,7 +6,7 @@
  * is picked up on the next launch (bump VERSION when shipping).
  */
 
-const VERSION = 'bdm-v5';
+const VERSION = 'bdm-v6';
 const SHELL = [
   './',
   'index.html',
@@ -23,6 +23,7 @@ const SHELL = [
   'js/music/scoring.js',
   'js/content/library.js',
   'js/content/custom.js',
+  'js/content/progressions.js',
   'js/audio/pitch.js',
   'js/audio/onset.js',
   'js/audio/engine.js',
@@ -37,6 +38,7 @@ const SHELL = [
   'js/ui/screens/practice.js',
   'js/ui/screens/drums.js',
   'js/ui/screens/add-song.js',
+  'js/ui/screens/progressions.js',
   'js/content/tunes/index.js',
   'js/content/tunes/notation.js',
   'js/content/tunes/classical.js',

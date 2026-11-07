@@ -103,6 +103,14 @@ export function homeScreen({ navigate, present }) {
         ]),
         el('span', { style: { color: 'var(--muted-2)', display: 'flex' } }, [icon('next', 16)]),
       ]),
+      el('button.row', { type: 'button', onclick: () => navigate('/progressions') }, [
+        el('div.row__badge', {}, [icon('scale', 16)]),
+        el('div.row__main', {}, [
+          el('div.row__title', { text: 'Progressions' }),
+          el('div.row__meta', { text: '12 patterns x 12 keys - the songs behind the songs' }),
+        ]),
+        el('span', { style: { color: 'var(--muted-2)', display: 'flex' } }, [icon('next', 16)]),
+      ]),
       el('button.row', { type: 'button', onclick: () => navigate('/drums') }, [
         el('div.row__badge', { text: 'K' }),
         el('div.row__main', {}, [
