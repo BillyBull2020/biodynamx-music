@@ -1,24 +1,33 @@
 /**
  * Songs list and the item detail screen (the one place that offers
  * Practice / Play before you commit).
+ *
+ * The catalogue is three hundred pieces, so the list needs search and paging:
+ * rendering every row at once is slow on a phone and unreadable.
  */
 
 import { el, icon } from '../../util/dom.js';
-import { itemProgress } from '../../util/storage.js';
+import { itemProgress, customSong, removeCustomSong } from '../../util/storage.js';
 import { allItems, getTrack } from '../../content/library.js';
 import { backButton, pill, starsEl, topbar } from '../components.js';
 
-// Filters match either the item kind (song/riff/drill) or a tag (rock, love,
-// campfire, drums), because "rock" is a style, not a shape of exercise.
+// Filters match the item kind (song/riff/drill) or any tag (rock, carol, ...).
 const FILTERS = [
   { id: 'all', label: 'All' },
-  { id: 'rock', label: 'Rock' },
+  { id: 'mine', label: 'Mine' },
   { id: 'campfire', label: 'Campfire' },
+  { id: 'rock', label: 'Rock' },
   { id: 'love', label: 'Love' },
-  { id: 'drums', label: 'Drums' },
   { id: 'folk', label: 'Folk' },
   { id: 'classical', label: 'Classical' },
+  { id: 'carol', label: 'Christmas' },
+  { id: 'spiritual', label: 'Spirituals' },
+  { id: 'kids', label: 'Kids' },
+  { id: 'hymn', label: 'Hymns' },
   { id: 'blues', label: 'Blues' },
+  { id: 'world', label: 'World' },
+  { id: 'ragtime', label: 'Ragtime' },
+  { id: 'drums', label: 'Drums' },
   { id: 'riff', label: 'Riffs' },
   { id: 'drill', label: 'Drills' },
 ];
@@ -33,6 +42,8 @@ const KIND_LABEL = {
   drums: 'Drum chart',
 };
 
+const PAGE = 40;
+
 function matchesFilter(item, filter) {
   if (filter === 'all') return true;
   if (item.kind === filter) return true;
@@ -41,14 +52,32 @@ function matchesFilter(item, filter) {
 
 export function songsScreen({ navigate, present }) {
   let filter = 'all';
+  let query = '';
+  let shown = PAGE;
   const listHost = el('div.vstack', { style: { gap: '8px' } });
+  const countEl = el('span.sub');
+  const moreHost = el('div', { style: { marginTop: '10px' } });
+
+  function selection() {
+    const q = query.trim().toLowerCase();
+    return allItems()
+      .filter((i) => matchesFilter(i, filter))
+      .filter((i) => !q || i.title.toLowerCase().includes(q) || (i.subtitle || '').toLowerCase().includes(q))
+      .sort((a, b) => (a.tags?.includes('mine') ? 1 : 0) - (b.tags?.includes('mine') ? 1 : 0) || a.title.localeCompare(b.title));
+  }
 
   function paint() {
-    const items = allItems()
-      .filter((i) => matchesFilter(i, filter))
-      .sort((a, b) => a.level - b.level || a.title.localeCompare(b.title));
+    const items = selection();
+    countEl.textContent = `${items.length} piece${items.length === 1 ? '' : 's'}`;
     listHost.innerHTML = '';
-    for (const spec of items) {
+    moreHost.innerHTML = '';
+
+    if (!items.length) {
+      listHost.appendChild(el('div.card', { text: 'Nothing matches that search.' }));
+      return;
+    }
+
+    for (const spec of items.slice(0, shown)) {
       const t = getTrack(spec.id);
       if (!t) continue;
       const prog = itemProgress(spec.id);
@@ -66,8 +95,47 @@ export function songsScreen({ navigate, present }) {
         ]),
       );
     }
-    if (!listHost.children.length) listHost.appendChild(el('div.card', { text: 'Nothing here yet.' }));
+
+    if (items.length > shown) {
+      moreHost.appendChild(
+        el('button.btn.btn--block', {
+          type: 'button',
+          text: `Show ${Math.min(PAGE, items.length - shown)} more of ${items.length}`,
+          onclick: () => {
+            shown += PAGE;
+            paint();
+          },
+        }),
+      );
+    }
   }
+
+  const search = el('input', {
+    type: 'search',
+    placeholder: 'Search the songs…',
+    'aria-label': 'Search songs',
+    style: {
+      width: '100%',
+      padding: '13px 14px',
+      borderRadius: '13px',
+      border: '1px solid var(--line)',
+      background: 'var(--card)',
+      color: 'var(--white)',
+      font: 'inherit',
+      outline: 'none',
+    },
+    oninput: (ev) => {
+      query = ev.target.value;
+      shown = PAGE;
+      paint();
+    },
+  });
+
+  const addBtn = el(
+    'button.btn.btn--sm.btn--primary',
+    { type: 'button', style: { flex: 'none' }, onclick: () => navigate('/add') },
+    [icon('check', 14), 'Add'],
+  );
 
   const chips = FILTERS.map((f) =>
     el('button', {
@@ -75,9 +143,10 @@ export function songsScreen({ navigate, present }) {
       class: 'chip',
       'aria-pressed': String(f.id === filter),
       text: f.label,
-      style: { cursor: 'pointer' },
+      style: { cursor: 'pointer', flex: 'none' },
       onclick: (ev) => {
         filter = f.id;
+        shown = PAGE;
         for (const c of chips) c.setAttribute('aria-pressed', String(c === ev.currentTarget));
         paint();
       },
@@ -87,13 +156,16 @@ export function songsScreen({ navigate, present }) {
   paint();
 
   const node = el('div.fade-in', {}, [
-    el('h1', { text: 'Songs & riffs' }),
+    el('h1', { text: 'Songs' }),
     el('p.sub', {
-      text: 'Rock, love songs, campfire singalongs and drum charts — all public domain or written for this app.',
-      style: { marginBottom: '14px' },
+      text: 'Classical, Christmas, folk, spirituals, kids, hymns, ragtime, rock, blues and drums — all public domain or written for this app. Add your own with the Add button.',
+      style: { marginBottom: '12px' },
     }),
-    el('div.hstack', { style: { overflowX: 'auto', paddingBottom: '12px', gap: '6px' } }, chips),
+    el('div.hstack', { style: { gap: '8px' } }, [search, addBtn]),
+    el('div.hstack', { style: { overflowX: 'auto', padding: '12px 0', gap: '6px' } }, chips),
+    el('div.hstack', { style: { marginBottom: '10px' } }, [countEl]),
     listHost,
+    moreHost,
   ]);
 
   present({ tab: '/songs', topbar: topbar({ brand: true }), node });
@@ -106,6 +178,7 @@ export function itemScreen({ params, navigate, present }) {
     return;
   }
   const prog = itemProgress(params.id);
+  const mine = customSong(params.id);
 
   const facts = el('div.result__grid', { style: { maxWidth: 'none', marginBottom: '4px' } }, [
     el('div.result__cell', {}, [el('b', { text: String(t.events.length) }), el('span', { text: 'notes' })]),
@@ -116,7 +189,7 @@ export function itemScreen({ params, navigate, present }) {
 
   const node = el('div.fade-in', {}, [
     el('div.hstack', { style: { marginBottom: '6px', gap: '8px' } }, [
-      pill(KIND_LABEL[t.kind] || t.kind, 'cyan'),
+      pill(KIND_LABEL[t.kind] || t.kind, mine ? 'violet' : 'cyan'),
       prog.plays ? pill(`played ${prog.plays}×`, 'lime') : pill('not played yet'),
     ]),
     el('h1', { text: t.title }),
@@ -143,6 +216,17 @@ export function itemScreen({ params, navigate, present }) {
         { type: 'button', onclick: () => navigate(`/play/${t.id}?mode=play`) },
         [icon('songs', 18), 'Play at full tempo for stars'],
       ),
+      mine
+        ? el('button.btn.btn--danger.btn--block', {
+            type: 'button',
+            style: { marginTop: '10px' },
+            text: 'Delete this song',
+            onclick: () => {
+              removeCustomSong(mine.id);
+              navigate('/songs', { replace: true });
+            },
+          })
+        : null,
     ]),
     el('p.tiny', {
       style: { marginTop: '12px' },

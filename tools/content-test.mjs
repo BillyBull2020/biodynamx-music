@@ -33,7 +33,8 @@ for (const spec of items) {
   if (t.events.length === 0) bad(spec.id, 'no events');
   if (t.totalBeats <= 0) bad(spec.id, 'zero length');
   if (!isFinite(t.bpm) || t.bpm < 30 || t.bpm > 240) bad(spec.id, `suspicious bpm ${t.bpm}`);
-  if (!(t.beatsPerBar >= 2 && t.beatsPerBar <= 8)) bad(spec.id, `bad beatsPerBar ${t.beatsPerBar}`);
+  // Compound meters (6/8, 9/8, 12/8) are legitimate, so allow up to twelve.
+  if (!(t.beatsPerBar >= 2 && t.beatsPerBar <= 12)) bad(spec.id, `bad beatsPerBar ${t.beatsPerBar}`);
 
   for (const e of t.events) {
     if (!isFinite(e.beat) || e.beat < 0) bad(spec.id, `bad beat ${e.beat}`);

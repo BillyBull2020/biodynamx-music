@@ -34,6 +34,8 @@ const DEFAULTS = {
   dailyGoalMinutes: 10,
   today: { day: null, seconds: 0, notes: 0, items: 0 },
   recentlyPlayed: [],
+  // Songs the player added themselves. Local only, never uploaded.
+  customSongs: [],
 };
 
 function clone(v) {
@@ -208,4 +210,32 @@ export async function importProgress(file) {
   rollDay();
   flush();
   return true;
+}
+
+
+/* --------------------------------------------------------- your own songs */
+
+/** All custom songs, newest first. */
+export function customSongs() {
+  const s = load();
+  return Array.isArray(s.customSongs) ? s.customSongs : [];
+}
+
+export function customSong(id) {
+  return customSongs().find((c) => c.id === id) || null;
+}
+
+export function addCustomSong(song) {
+  const s = load();
+  if (!Array.isArray(s.customSongs)) s.customSongs = [];
+  s.customSongs = [song, ...s.customSongs.filter((c) => c.id !== song.id)];
+  flush();
+  return song;
+}
+
+export function removeCustomSong(id) {
+  const s = load();
+  s.customSongs = (s.customSongs || []).filter((c) => c.id !== id);
+  delete s.items[id];
+  flush();
 }

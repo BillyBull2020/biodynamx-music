@@ -20,6 +20,10 @@ import { makeTrack } from '../music/track.js';
 import { parseTab, sequence } from '../music/tab.js';
 import { CHORDS, shapeMidis } from '../music/theory.js';
 import { drumPattern } from '../music/drums.js';
+import { TUNES } from './tunes/index.js';
+import { parseMelody, simplify } from './tunes/notation.js';
+import { customSongs, customSong } from '../util/storage.js';
+import { buildCustom } from './custom.js';
 
 /* --------------------------------------------------------------- helpers */
 
@@ -1534,6 +1538,62 @@ const WAVE_SPECS = {
 
 Object.assign(SPECS, WAVE_SPECS);
 
+/* ======================================================== SONG CATALOGUE ===
+ * Every tune in tunes/ becomes two pieces: the tune itself, and an "Easy"
+ * arrangement with the fast passing notes removed. That is the basic/main split
+ * the reference app documents, and it is how this library reaches a few hundred
+ * playable pieces without padding the list with filler.
+ */
+
+/** Turn a [midi, durBeats] pair list into makeTrack notes. */
+function pairsToNotes(pairs) {
+  const notes = [];
+  let beat = 0;
+  for (const [midi, dur] of pairs) {
+    if (midi !== null) notes.push({ beat, midi, durBeats: dur });
+    beat += dur;
+  }
+  return notes;
+}
+
+const tuneTracks = {};
+
+for (const tune of TUNES) {
+  const pairs = parseMelody(tune.m);
+  if (pairs.length < 3) continue;
+  const beatsPerBar = tune.bb || 4;
+  const base = {
+    title: tune.t,
+    subtitle: tune.c,
+    kind: 'song',
+    level: tune.level || 6,
+    beatsPerBar,
+    difficulty: 3,
+    tags: ['traditional', tune.k],
+    about: `${tune.t} — ${tune.c}. Public domain, arranged for one guitar line.`,
+  };
+
+  tuneTracks[tune.id] = {
+    ...base,
+    bpm: tune.bpm,
+    make: () => ({ notes: pairsToNotes(pairs) }),
+  };
+
+  const easy = simplify(pairs);
+  tuneTracks[`${tune.id}-easy`] = {
+    ...base,
+    title: `${tune.t} (easy)`,
+    level: Math.max(1, (tune.level || 6) - 3),
+    bpm: Math.max(50, Math.round(tune.bpm * 0.8)),
+    difficulty: 2,
+    tags: ['traditional', tune.k, 'easy'],
+    about: `${tune.t} — ${tune.c}. The simplified line: passing notes removed, slower tempo.`,
+    make: () => ({ notes: pairsToNotes(easy) }),
+  };
+}
+
+Object.assign(SPECS, tuneTracks);
+
 Object.assign(SPECS, SONG_SPECS, DRUM_SPECS);
 
 /* -------------------------------------------------------- public API */
@@ -1554,6 +1614,33 @@ export function getItemSpec(id) {
  */
 export function getTrack(id) {
   if (cache.has(id)) return cache.get(id);
+
+  // Custom songs live in storage, not in the SPECS registry.
+  const custom = String(id).startsWith('mine-') ? customSong(id) : null;
+  if (custom) {
+    const built = buildCustom(custom);
+    if (built) {
+      const track = makeTrack({
+        id: custom.id,
+        title: custom.title || 'My song',
+        subtitle: 'Added by you',
+        kind: 'song',
+        level: custom.level || 3,
+        bpm: custom.bpm || 90,
+        beatsPerBar: custom.beatsPerBar || 4,
+        difficulty: 2,
+        tags: ['mine'],
+        about: custom.body ? `Your own chart. ${custom.format === 'tab' || /^[A-Ga-g]/.test(custom.body) ? 'Tab' : 'Chords'}: ${String(custom.body).split('\n')[0].slice(0, 80)}` : '',
+        notes: built.notes || [],
+        chords: built.chords || [],
+        tuningId: built.tuningId || 'standard',
+        mode: built.mode,
+      });
+      cache.set(id, track);
+      return track;
+    }
+  }
+
   const spec = SPECS[id];
   if (!spec) return null;
   let track = null;
@@ -1585,9 +1672,21 @@ export function getTrack(id) {
 }
 
 export function allItems() {
-  return itemIds()
+  const builtIn = itemIds()
     .map((id) => ({ id, ...SPECS[id] }))
     .filter((s) => s && s.title);
+  // Custom songs come last so the public-domain catalogue stays first in the list.
+  const mine = customSongs().map((c) => ({
+    id: c.id,
+    title: c.title || 'My song',
+    subtitle: 'Added by you',
+    kind: 'song',
+    level: c.level || 3,
+    bpm: c.bpm || 90,
+    difficulty: 2,
+    tags: ['mine'],
+  }));
+  return [...builtIn, ...mine];
 }
 
 /**
